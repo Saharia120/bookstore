@@ -35,12 +35,17 @@
 
 ### Backend
 
-1. Open a terminal.
+1. Clone the repository:
+
+```bash
+git clone https://github.com/Saharia120/bookstore.git
+cd bookstore
+```
 
 2. Navigate to the backend folder:
 
 ```bash
-cd ~/Desktop/bookstore-app/backend/bookstore
+cd backend/bookstore
 ```
 
 3. Run the Spring Boot application:
@@ -56,21 +61,19 @@ http://localhost:8080
 
 ### Frontend
 
-1. Open another terminal.
-
-2. Navigate to the frontend folder:
+1. Open another terminal and navigate to the frontend folder:
 
 ```bash
-cd ~/Desktop/bookstore-app/frontend
+cd bookstore/frontend
 ```
 
-3. Start the frontend live server:
+2. Start the frontend live server:
 
 ```bash
 live-server --port=5500
 ```
 
-4. Open the application in your browser:
+3. Open the application in your browser:
 
 http://127.0.0.1:5500
 
