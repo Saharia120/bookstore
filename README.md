@@ -23,19 +23,19 @@ This is a mini online bookstore project built for the Growth Analytics & CRO Spe
 
 ### Database
 - MySQL (or H2 for testing)
+- All project files (frontend & backend) included
+
+### Bonus / Extra Features
+- Clean UI/UX improvements
+- Toast notifications (if implemented)
+- Loading spinner while API loads
+- Pagination or sorting (if implemented)
+- Fully responsive for desktop
 
 ## How to Run
 
 ### Backend
-1. Navigate to the backend folder
-2. Run `./mvnw spring-boot:run` (or via IDE)
-3. Application runs on `http://localhost:8080`
-
-### Frontend
-1. Open `index.html` in a browser
-2. Connects to backend APIs
-
-## Notes
-- `.DS_Store` files are system files from macOS, can be ignored.
-- This project demonstrates a basic full-stack bookstore app.
-- All project files (frontend & backend) are included in this repository.
+1. Open a terminal
+2. Navigate to the backend folder:
+   ```bash
+   cd /Users/sahariasarder/Desktop/bookstore-app/backend/bookstore
