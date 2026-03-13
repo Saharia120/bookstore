@@ -1,6 +1,5 @@
 # Mini Online Bookstore App
 
-This is a mini online bookstore project built for the Growth Analytics & CRO Specialist technical assignment at Rokomari.com.
 
 ## Features
 
