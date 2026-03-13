@@ -34,7 +34,44 @@
 ## How to Run
 
 ### Backend
-1. Open a terminal
+
+1. Open a terminal.
+
 2. Navigate to the backend folder:
-   ```bash
-   cd /Users/sahariasarder/Desktop/bookstore-app/backend/bookstore
+
+```bash
+cd ~/Desktop/bookstore-app/backend/bookstore
+```
+
+3. Run the Spring Boot application:
+
+```bash
+./mvnw spring-boot:run
+```
+
+4. The backend server will start at:
+
+http://localhost:8080
+
+
+### Frontend
+
+1. Open another terminal.
+
+2. Navigate to the frontend folder:
+
+```bash
+cd ~/Desktop/bookstore-app/frontend
+```
+
+3. Start the frontend live server:
+
+```bash
+live-server --port=5500
+```
+
+4. Open the application in your browser:
+
+http://127.0.0.1:5500
+
+The frontend will communicate with the backend APIs running on port **8080**.
