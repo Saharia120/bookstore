@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookstore Home</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+body {font-family: Arial, Helvetica, sans-serif; margin:0; padding:0; background:#f2f4f8;}
+header {display:flex; justify-content: space-between; align-items:center; background:#007bff; color:white; padding:15px 30px;}
+header h1 {margin:0;}
+header a {color:white; text-decoration:none; background:#28a745; padding:8px 12px; border-radius:6px;}
+header a:hover {opacity:0.85;}
+#search-box {text-align:center; margin:15px 0;}
+#search {padding:8px 12px; width:90%; max-width:400px; border-radius:6px; border:1px solid #ccc;}
+#book-list {display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; padding:20px; max-width:1200px; margin:auto;}
+.book-card{background:white; border-radius:12px; padding:15px; box-shadow:0 4px 12px rgba(0,0,0,0.1); display:flex; flex-direction:column; align-items:center; transition:0.3s;}
+.book-card:hover{transform:translateY(-6px); box-shadow:0 8px 20px rgba(0,0,0,0.15);}
+.book-card img.cover{width:140px; height:200px; object-fit:cover; border-radius:6px; margin-bottom:10px;}
+.book-card h3{text-align:center; margin:5px 0;}
+.book-card p{margin:3px 0; font-size:14px; color:#333;}
+.book-card button{margin-top:6px; padding:8px 12px; border:none; border-radius:8px; cursor:pointer; font-size:13px; width:100%; margin-bottom:5px;}
+.add-btn{background:#007bff; color:white;}
+.details-btn{background:#28a745; color:white;}
+.add-btn:hover{background:#0056b3;}
+.details-btn:hover{background:#1e7e34;}
+#toast {position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transform: translateY(-20px); transition: opacity 0.4s ease, transform 0.4s ease; z-index: 1000;}
+#toast.show {opacity:1; transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Bookstore</h1>
+    <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+</header>
+
+<div id="search-box">
+    <input type="text" id="search" placeholder="Search by title or author...">
+</div>
+
+<main id="book-list"></main>
+<div id="toast"></div>
+
+<script>
+// ===== Book Data with Online Covers =====
+const books = [
+  {id:1,title:"Java Programming",author:"James Gosling",price:25,category:"Programming",stock:10,img:"https://dummyimage.com/150x200/cccccc/000000&text=Java",description:"Learn Java from basics to advanced."},
+  {id:2,title:"Python Essentials",author:"Guido van Rossum",price:30,category:"Programming",stock:8,img:"https://dummyimage.com/150x200/cccccc/000000&text=Python",description:"Python essentials."},
+  {id:3,title:"HTML & CSS Design",author:"Jon Duckett",price:20,category:"Web Design",stock:15,img:"https://dummyimage.com/150x200/cccccc/000000&text=HTML+CSS",description:"Master HTML & CSS to build beautiful web pages."},
+  {id:4,title:"Node JS Basics",author:"Ryan Dahl",price:32,category:"Programming",stock:12,img:"https://dummyimage.com/150x200/cccccc/000000&text=Node+JS",description:"Introduction to Node JS."},
+  {id:5,title:"Networking",author:"Andrew Tanenbaum",price:26,category:"Networking",stock:9,img:"https://dummyimage.com/150x200/cccccc/000000&text=Networking",description:"Networking fundamentals."},
+  {id:6,title:"React Essentials",author:"Dan Abramov",price:30,category:"Web Dev",stock:8,img:"https://dummyimage.com/150x200/cccccc/000000&text=React",description:"Learn React for modern web development."},
+  {id:7,title:"Python Advanced",author:"Guido van Rossum",price:35,category:"Programming",stock:6,img:"https://dummyimage.com/150x200/cccccc/000000&text=Python+Adv",description:"Advanced Python techniques."},
+  {id:8,title:"JavaScript Guide",author:"Brendan Eich",price:28,category:"Programming",stock:10,img:"https://dummyimage.com/150x200/cccccc/000000&text=JS",description:"Complete JavaScript guide."},
+  {id:9,title:"CSS Mastery",author:"Eric Meyer",price:22,category:"Web Design",stock:15,img:"https://dummyimage.com/150x200/cccccc/000000&text=CSS",description:"Advanced CSS techniques."},
+  {id:10,title:"Database Design",author:"C.J. Date",price:40,category:"Database",stock:7,img:"https://dummyimage.com/150x200/cccccc/000000&text=Database",description:"Learn database design."},
+  {id:11,title:"Cloud Computing",author:"Tom White",price:38,category:"IT",stock:5,img:"https://dummyimage.com/150x200/cccccc/000000&text=Cloud",description:"Cloud computing fundamentals."},
+  {id:12,title:"Node JS",author:"Ryan Dahl",price:32,category:"Web",stock:10,img:"https://dummyimage.com/150x200/cccccc/000000&text=Node2",description:"Node JS practical guide."}
+];
+
+// ===== DOM Elements =====
+const bookList = document.getElementById("book-list");
+const cartCount = document.getElementById("cart-count");
+const searchInput = document.getElementById("search");
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+// ===== Functions =====
+function updateCartCount(){
+    cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const totalQty = cart.reduce((acc,b)=>acc+(b.quantity||1),0);
+    cartCount.textContent = totalQty;
+}
+
+function showToast(msg){
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(()=> toast.classList.remove("show"),2000);
+}
+
+function addToCart(bookId){
+    const book = books.find(b => b.id === bookId);
+    let existing = cart.find(b=>b.id===bookId);
+    if(existing){ existing.quantity = (existing.quantity||1) + 1; }
+    else { cart.push({...book, quantity:1}); }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+    showToast(`${book.title} added to cart!`);
+}
+
+function viewDetails(bookId){
+    window.location.href = `book.html?id=${bookId}`;
+}
+
+function renderBooks(filteredBooks){
+    bookList.innerHTML="";
+    filteredBooks.forEach(book=>{
+        const div = document.createElement("div");
+        div.className="book-card";
+        div.innerHTML=`
+            <img src="${book.img}" alt="${book.title}" class="cover">
+            <h3>${book.title}</h3>
+            <p>Author: ${book.author}</p>
+            <p>Price: $${book.price}</p>
+            <p>Category: ${book.category}</p>
+            <p>Stock: ${book.stock}</p>
+            <button class="add-btn" onclick="addToCart(${book.id})">Add to Cart</button>
+            <button class="details-btn" onclick="viewDetails(${book.id})">View Details</button>
+        `;
+        bookList.appendChild(div);
+    });
+}
+
+// ===== Initial Render =====
+renderBooks(books);
+updateCartCount();
+
+// ===== Search =====
+searchInput.addEventListener("input", ()=>{
+    const keyword = searchInput.value.toLowerCase();
+    const filtered = books.filter(b=> b.title.toLowerCase().includes(keyword) || b.author.toLowerCase().includes(keyword));
+    renderBooks(filtered);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg,#eef2f7,#dbe6f6);
+    margin:0; padding:0;
+}
+header {
+    display:flex; justify-content: space-between; align-items:center;
+    background:#007bff; color:white; padding:15px 30px;
+}
+header h1 {margin:0;}
+header a {color:white; text-decoration:none; background:#28a745; padding:8px 12px; border-radius:6px;}
+header a:hover {opacity:0.85;}
+
+main#cart-list {
+    max-width:800px; margin:30px auto; padding:20px;
+}
+
+.cart-item {
+    display:flex; justify-content: space-between; align-items:center;
+    background:white; margin-bottom:15px; border-radius:10px; padding:15px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1); flex-wrap:wrap;
+}
+.cart-item .details h3 {margin:0;}
+.cart-item .details p {margin:4px 0; color:#555;}
+.cart-item .controls {display:flex; flex-direction:column; align-items:flex-end;}
+.quantity-controls {display:flex; align-items:center; margin-bottom:6px;}
+.quantity-controls button {
+    padding:4px 10px; margin:0 5px; border:none; border-radius:5px; background:#007bff;
+    color:white; cursor:pointer;
+}
+.quantity-controls button:hover {opacity:0.85;}
+.remove-btn {
+    background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:6px;
+    cursor:pointer; margin-top:6px;
+}
+.remove-btn:hover {opacity:0.85;}
+#grand-total {text-align:right; font-size:18px; font-weight:bold; margin-top:20px;}
+.empty-cart {text-align:center; font-size:18px; color:#555; margin-top:50px;}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Your Cart</h1>
+<a href="index.html">← Back to Home</a>
+</header>
+
+<main id="cart-list"></main>
+<p id="grand-total"></p>
+
+<script>
+const cartList = document.getElementById("cart-list");
+const grandTotalEl = document.getElementById("grand-total");
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function saveCart(){ localStorage.setItem("cart", JSON.stringify(cart)); }
+
+function removeFromCart(index){ cart.splice(index,1); saveCart(); renderCart(); }
+function increaseQty(index){ cart[index].quantity +=1; saveCart(); renderCart(); }
+function decreaseQty(index){
+    if(cart[index].quantity>1){ cart[index].quantity -=1; saveCart(); renderCart(); }
+    else removeFromCart(index);
+}
+
+function renderCart(){
+    cartList.innerHTML="";
+    if(cart.length===0){ 
+        grandTotalEl.textContent="";
+        cartList.innerHTML="<p class='empty-cart'>Your cart is empty.</p>"; 
+        return;
+    }
+
+    let grandTotal = 0;
+
+    cart.forEach((book,index)=>{
+        const subtotal = book.price * book.quantity;
+        grandTotal += subtotal;
+        const div = document.createElement("div");
+        div.className="cart-item";
+        div.innerHTML=`
+            <div class="details">
+                <h3>${book.title}</h3>
+                <p>Author: ${book.author}</p>
+                <p>Price: $${book.price}</p>
+            </div>
+            <div class="controls">
+                <div class="quantity-controls">
+                    <button onclick="decreaseQty(${index})">-</button>
+                    <span>${book.quantity}</span>
+                    <button onclick="increaseQty(${index})">+</button>
+                </div>
+                <p>Subtotal: $${subtotal.toFixed(2)}</p>
+                <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
+            </div>
+        `;
+        cartList.appendChild(div);
+    });
+
+    grandTotalEl.textContent = `Grand Total: $${grandTotal.toFixed(2)}`;
+}
+
+// Initialize quantity if missing
+cart.forEach(b=>{ if(!b.quantity)b.quantity=1; });
+
+renderCart();
+</script>
+
+</body>
+</html>

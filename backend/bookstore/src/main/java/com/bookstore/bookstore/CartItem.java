@@ -1,0 +1,20 @@
+package com.bookstore.bookstore;
+
+public class CartItem {
+    private Book book;
+    private int quantity;
+
+    public CartItem(Book book) {
+        this.book = book;
+        this.quantity = 1;
+    }
+
+    public Book getBook() { return book; }
+    public void setBook(Book book) { this.book = book; }
+
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public void increment() { this.quantity++; }
+    public void decrement() { if(this.quantity>0) this.quantity--; }
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Details</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* Polished Book Details Page */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg,#eef2f7,#dbe6f6);
+    margin:0; padding:0;
+}
+header {
+    display:flex; justify-content: space-between; align-items:center;
+    background:#007bff; color:white; padding:15px 30px;
+}
+header h1 {margin:0;}
+header a {
+    color:white; text-decoration:none; background:#28a745; padding:8px 12px; border-radius:6px;
+}
+header a:hover {opacity:0.85;}
+
+.book-details-card {
+    max-width:600px; margin:30px auto; background:white;
+    border-radius:12px; padding:20px; box-shadow:0 6px 15px rgba(0,0,0,0.1);
+}
+.book-details-card img.book-cover {
+    width:100%; max-width:250px; display:block; margin:auto; border-radius:6px;
+}
+.book-details-card h2 {
+    text-align:center; margin:15px 0 5px 0;
+}
+.book-details-card p {
+    margin:5px 0; color:#333;
+}
+.book-details-card .description {
+    margin:10px 0;
+}
+.quantity-selector {
+    display:flex; justify-content:center; align-items:center; margin:15px 0;
+}
+.quantity-selector button {
+    padding:6px 12px; border:none; background:#007bff; color:white; border-radius:6px; cursor:pointer;
+    font-size:16px; margin:0 10px;
+}
+.quantity-selector span {
+    font-size:16px; min-width:30px; text-align:center;
+}
+#subtotal {
+    text-align:center; font-weight:bold; margin:10px 0;
+}
+#add-to-cart {
+    width:100%; padding:10px; border:none; border-radius:8px; background:#28a745; color:white;
+    cursor:pointer; font-size:16px; margin-bottom:10px;
+}
+#add-to-cart:hover {opacity:0.85;}
+
+/* Toast */
+#toast {
+    position: fixed; top:20px; right:20px;
+    background:#28a745; color:white; padding:12px 20px; border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2); opacity:0;
+    transform: translateY(-20px); transition:opacity 0.4s, transform 0.4s;
+    z-index:1000;
+}
+#toast.show {opacity:1; transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Book Details</h1>
+    <a href="index.html">← Back to Home</a>
+</header>
+
+<div class="book-details-card" id="book-details">
+    <!-- JS will populate content -->
+</div>
+
+<div id="toast"></div>
+
+<script>
+const books = [
+    {id:1, title:"Java Programming", author:"James Gosling", price:25, category:"Programming", stock:10, description:"Learn Java from basics to advanced.", image:"img/java.png"},
+    {id:2, title:"Python Essentials", author:"Guido van Rossum", price:30, category:"Programming", stock:8, description:"Master Python programming.", image:"img/python.png"},
+    {id:3, title:"HTML & CSS Design", author:"Jon Duckett", price:20, category:"Web Design", stock:15, description:"Build modern websites with HTML & CSS.", image:"img/htmlcss.png"},
+    {id:4, title:"Node JS Basics", author:"Ryan Dahl", price:32, category:"Programming", stock:12, description:"Learn Node JS fundamentals.", image:"img/nodejs.png"},
+    // add more books if needed
+];
+
+const container = document.getElementById("book-details");
+const toast = document.getElementById("toast");
+
+const params = new URLSearchParams(window.location.search);
+const id = parseInt(params.get("id"));
+
+let quantity = 1;
+let currentBook = books.find(b=>b.id===id);
+
+if(!currentBook){
+    container.innerHTML = "<p style='text-align:center;margin:30px;font-size:18px;'>Book not found.</p>";
+} else {
+    container.innerHTML = `
+        <img src="${currentBook.image || 'img/placeholder.png'}" alt="${currentBook.title}" class="book-cover">
+        <h2>${currentBook.title}</h2>
+        <p><b>Author:</b> ${currentBook.author}</p>
+        <p><b>Category:</b> ${currentBook.category}</p>
+        <p><b>Stock:</b> ${currentBook.stock}</p>
+        <p><b>Price:</b> $${currentBook.price}</p>
+        <p class="description">${currentBook.description}</p>
+
+        <div class="quantity-selector">
+            <button id="decrease">-</button>
+            <span id="quantity">${quantity}</span>
+            <button id="increase">+</button>
+        </div>
+
+        <p id="subtotal"><b>Subtotal:</b> $${currentBook.price * quantity}</p>
+        <button id="add-to-cart">Add to Cart</button>
+    `;
+
+    const increaseBtn = document.getElementById("increase");
+    const decreaseBtn = document.getElementById("decrease");
+    const addBtn = document.getElementById("add-to-cart");
+
+    increaseBtn.onclick = ()=>{ changeQuantity(1); };
+    decreaseBtn.onclick = ()=>{ changeQuantity(-1); };
+    addBtn.onclick = ()=>{ addToCart(); };
+}
+
+function changeQuantity(diff){
+    quantity += diff;
+    if(quantity < 1) quantity = 1;
+    if(quantity > currentBook.stock) quantity = currentBook.stock;
+    document.getElementById("quantity").textContent = quantity;
+    document.getElementById("subtotal").innerHTML = `<b>Subtotal:</b> $${(currentBook.price * quantity).toFixed(2)}`;
+}
+
+function addToCart(){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const bookToAdd = {...currentBook, quantity};
+    const exists = cart.find(b=>b.id===bookToAdd.id);
+    if(exists){
+        exists.quantity += quantity;
+        if(exists.quantity > currentBook.stock) exists.quantity = currentBook.stock;
+    } else {
+        cart.push(bookToAdd);
+    }
+    localStorage.setItem("cart", JSON.stringify(cart));
+    showToast(`${currentBook.title} added to cart!`);
+}
+
+function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(()=> toast.classList.remove("show"),2000);
+}
+</script>
+
+</body>
+</html>
