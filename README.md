@@ -45,9 +45,9 @@ Backend will start at:
 http://localhost:8080
 
 ### Run Frontend
-Open another terminal
+Open another terminal.
 
-cd bookstore/frontend
+cd frontend
 
 If live-server is not installed:
 npm install -g live-server
