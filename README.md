@@ -34,26 +34,38 @@
 ## How to Run
 
 ### Clone Repository
+```bash
 git clone https://github.com/Saharia120/bookstore.git
 cd bookstore
+```
 
 ### Run Backend
+```bash
 cd backend/bookstore
 ./mvnw spring-boot:run
+```
 
-Backend will start at:
+Backend runs at:  
 http://localhost:8080
 
 ### Run Frontend
-Open another terminal.
+Open another terminal
 
+```bash
 cd frontend
+```
 
 If live-server is not installed:
+
+```bash
 npm install -g live-server
+```
 
 Run frontend:
-live-server --port=5500
 
-Open browser:
+```bash
+live-server --port=5500
+```
+
+Open in browser:  
 http://127.0.0.1:5500
